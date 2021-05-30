@@ -8,41 +8,35 @@ let all = List.fold_right Feasible.add
     [1;2;3;4;5;6;7;8;9] Feasible.empty
 
 (* Pattern de recherche des nombres possibles *)
-let find_feasible i j grid cond next used =
-    let rec find_feasible i j used =
+let find_feasible i j grid cond next =
+    let rec find_feasible i j feasible =
         if cond i j then
             let (i', j') = next i j in
             match grid.(i).(j) with
-            | Some x -> find_feasible i' j' (add x used)
-            | None -> find_feasible i' j' used
-        else used
-    in find_feasible i j used
+            | Some x -> find_feasible i' j' (remove x feasible)
+            | None -> find_feasible i' j' feasible
+        else feasible
+    in find_feasible i j all
 
 (* Pour la ligne *)
 let feasible_row i j grid =
-    let row = find_feasible i 0 grid 
+    find_feasible i 0 grid 
         (fun i j -> j < 9) 
-        (fun i j -> (i, j + 1)) 
-    in 
-    diff all (row empty)
+        (fun i j -> (i, j + 1))
 
 (* Pour la colonne *)
 let feasible_column i j grid =
-    let column = find_feasible 0 j grid 
+    find_feasible 0 j grid 
         (fun i j -> i < 9) 
-        (fun i j -> (i + 1, j)) 
-    in
-    diff all (column empty)
+        (fun i j -> (i + 1, j))
 
 (* Pour le carré *)
 let feasible_square i j grid =
     (* Dans quel carré suis-je ? *)
     let (si, sj) = ((i / 3) * 3, (j / 3) * 3) in
-    let square = find_feasible si sj grid 
+    find_feasible si sj grid 
         (fun i j -> i < si + 3 && j < sj + 3) 
         (fun i j -> if j < sj + 2 then (i, j + 1) else (i + 1, sj))
-    in
-    diff all (square empty)
 
 (* Les 3 contraintes en même temps *)
 let feasible_all_direction i j grid =
