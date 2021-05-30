@@ -30,5 +30,17 @@ let parse file =
                 | _ -> failwith "Parsing error inconsistent"
                 ) line in fill (i + 1)
         with End_of_file -> close_in cursor
-    in let () = fill 0 in res    
+    in let () = fill 0 in res
+    
+let print_sudoku grid =
+    let print x = Printf.printf "%c" (match x with
+        | None -> '?'
+        | Some y -> (string_of_int y).[0]
+        )
+    in
+    let rec print_sudoku i j =
+        if i < 9 then
+            if j < 9 then (print grid.(i).(j); print_sudoku i (j + 1))
+            else (print_endline ""; print_sudoku (i + 1) 0)
+    in print_sudoku 0 0
     
