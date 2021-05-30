@@ -63,18 +63,21 @@ let compute_locations grid =
             else compute_locations (i + 1) 0 acc
         else acc
     in
-    List.sort (fun a b -> 
+    List.map (fun x -> x.pos) (List.sort (fun a b -> 
         (Feasible.cardinal a.feasible) - (Feasible.cardinal b.feasible)
-        ) (compute_locations 0 0 [])
+        ) (compute_locations 0 0 []))
 
 (* Algorithme de backtracking vérifiant la validité du sudoku *)
-let is_valid grid locations =
-    let rec is_valid locations =
-        match locations with
-        | [] -> ???
-        | x :: s -> ??? 
+let rec is_valid grid locations =
+    match locations with
+    | [] -> true
+    | (i, j) :: s ->
+        grid.(i).(j) <- None;
+        let feasible = feasible_all_direction i j grid in
+        exists (fun x -> grid.(i).(j) <- Some x; is_valid grid s) feasible
 
-let solve =
+let solve grid =
+    is_valid grid (compute_locations grid)
 
 
 
