@@ -1,5 +1,3 @@
-(* Algorithme inspiré de http://igm.univ-mlv.fr/~dr/XPOSE2013/sudoku/ *)
-
 module Feasible = Set.Make(Int)
 type location = { pos : int * int; feasible : Feasible.t }
 open Feasible
@@ -50,6 +48,7 @@ let feasible_all_direction i j grid =
 (* Calcul la liste des cases à remplir dans l'ordre croissant
 du nombre de possibilités de chaque case *)
 let compute_locations grid =
+    (* TODO: Utiliser Array.fold_right avec acc = (i, []) *)
     let rec compute_locations i j acc =
         if i < 9 then
             if j < 9 then
@@ -67,19 +66,36 @@ let compute_locations grid =
         (Feasible.cardinal a.feasible) - (Feasible.cardinal b.feasible)
         ) (compute_locations 0 0 []))
 
-(* Algorithme de backtracking vérifiant la validité du sudoku *)
+(* Algorithme de backtracking vérifiant la validité du sudoku
+inspiré de http://igm.univ-mlv.fr/~dr/XPOSE2013/sudoku/ *)
 let rec is_valid grid locations =
     match locations with
     | [] -> true
     | (i, j) :: s ->
-        grid.(i).(j) <- None;
         let feasible = feasible_all_direction i j grid in
-        exists (fun x -> grid.(i).(j) <- Some x; is_valid grid s) feasible
+        exists (fun x -> grid.(i).(j) <- Some x; 
+            let res = is_valid grid s in
+            if not res then grid.(i).(j) <- None; res) feasible
 
 let solve grid =
     is_valid grid (compute_locations grid)
 
-
-
-
+(* Vérifie que la solution est correcte en vérifiant que toutes les
+cases sont remplies et qu'il n'y a pas de doublon *)
+let check_solution grid =
+    let for_alli f a =
+        let n = Array.length a in
+        let rec for_alli i =
+            if i = n then true
+            else f i && for_alli (i + 1)
+        in for_alli 0 
+    in  
+    for_alli (fun i ->
+        for_alli (fun j ->
+            grid.(i).(j) <> None
+            (* Y a-t-il un doublon ? *)
+            && cardinal (feasible_row i j grid) = 0
+            && cardinal (feasible_row i j grid) = 0
+            && cardinal (feasible_row i j grid) = 0
+        ) grid.(i)) grid
 
