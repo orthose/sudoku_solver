@@ -1,7 +1,14 @@
+(**************************************************)
+(* Le module Solver contient toutes les fonctions *)
+(* de résolution de sudoku                        *)
+(**************************************************)
+
 module Feasible = Set.Make(Int)
+(* Type pour le pré-processing *)
 type location = { pos : int * int; feasible : Feasible.t }
 open Feasible
 
+(* Tous les nombres possibles mis dans un ensemble *)
 let all = List.fold_right Feasible.add
     [1;2;3;4;5;6;7;8;9] Feasible.empty
 
@@ -48,23 +55,28 @@ let feasible_all_direction i j grid =
 (* Calcul la liste des cases à remplir dans l'ordre croissant
 du nombre de possibilités de chaque case *)
 let compute_locations grid =
-    (* TODO: Utiliser Array.fold_right avec acc = (i, []) *)
-    let rec compute_locations i j acc =
-        if i < 9 then
-            if j < 9 then
-                if grid.(i).(j) = None then
-                    let loc = { 
-                        pos = (i, j);
-                        feasible = feasible_all_direction i j grid
-                    } in
-                    compute_locations i (j + 1) (loc :: acc)
-                else compute_locations i (j + 1) acc
-            else compute_locations (i + 1) 0 acc
-        else acc
-    in
+    (* Parcours de la grille du sudoku et calcul du nombre de
+    possibilités pour chaque emplacement *)
+    let locations = snd (
+    Array.fold_left (fun acc1 a ->
+        let (i, res1) = acc1 in
+        let (_, res2) = 
+        Array.fold_left (fun acc2 x ->
+            let (j, res2) = acc2 in
+            if grid.(i).(j) = None then
+                let loc = { 
+                    pos = (i, j);
+                    feasible = feasible_all_direction i j grid
+                } in (j + 1, loc :: res2)
+            else (j + 1, res2)
+        ) (0, res1) a in
+        (i + 1, res2)
+    ) (0, []) grid) in
+    
+    (* Tri par ordre croissant du nombre de possibiltés *)
     List.map (fun x -> x.pos) (List.sort (fun a b -> 
         (Feasible.cardinal a.feasible) - (Feasible.cardinal b.feasible)
-        ) (compute_locations 0 0 []))
+        ) locations)
 
 (* Algorithme de backtracking vérifiant la validité du sudoku
 inspiré de http://igm.univ-mlv.fr/~dr/XPOSE2013/sudoku/ *)
@@ -75,14 +87,17 @@ let rec is_valid grid locations =
         let feasible = feasible_all_direction i j grid in
         exists (fun x -> grid.(i).(j) <- Some x; 
             let res = is_valid grid s in
-            if not res then grid.(i).(j) <- None; res) feasible
+            if not res then grid.(i).(j) <- None; res
+            ) feasible
 
+(* Résolution du sudoku *)
 let solve grid =
     is_valid grid (compute_locations grid)
 
 (* Vérifie que la solution est correcte en vérifiant que toutes les
 cases sont remplies et qu'il n'y a pas de doublon *)
 let check_solution grid =
+    (* for_all mais avec indice *)
     let for_alli f a =
         let n = Array.length a in
         let rec for_alli i =
@@ -90,8 +105,10 @@ let check_solution grid =
             else f i && for_alli (i + 1)
         in for_alli 0 
     in  
+    
     for_alli (fun i ->
         for_alli (fun j ->
+            (* La grille est-elle remplie ? *)
             grid.(i).(j) <> None
             (* Y a-t-il un doublon ? *)
             && cardinal (feasible_row i j grid) = 0
