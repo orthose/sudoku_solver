@@ -61,14 +61,24 @@ let parse file =
             if i < 9 then failwith ("height = " ^ (string_of_int i) ^ " != 9")
     in let () = fill 0 in res
 
+(* Conversion de la grille du sudoku vers string *)
+let to_string =
+    Array.fold_left (fun acc1 a -> acc1 ^ (
+        Array.fold_left (fun acc2 x ->
+            let s = match x with
+                | None -> "-"
+                | Some y -> (string_of_int y)
+            in acc2 ^ s ^ " " 
+        ) "" a) ^ "\n"
+    ) ""
+    
 (* Affichage de sudoku en console *)
-let print =
-    let print x = Printf.printf "%c" (match x with
-        | None -> '-'
-        | Some y -> (string_of_int y).[0]
-        )
-    in
-    Array.iter (fun a -> 
-        Array.iter (fun x -> print x; print_char ' ') a; 
-        print_endline "")
+let print grid =
+    Printf.printf "%s" (to_string grid)
+
+(* Enregistrement dans un fichier une grille de sudoku *)    
+let save file grid =
+    let oc = open_out file in
+    Printf.fprintf oc "%s" (to_string grid);
+    close_out oc
     
