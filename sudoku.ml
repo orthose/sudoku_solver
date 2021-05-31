@@ -5,7 +5,7 @@
 (**************************************************)
 
 (* Exemple de grille *)
-let grid1 = [|
+let example1 = [|
     [|Some 9;None;None;Some 1;None;None;None;None;Some 5|];
     [|None;None;Some 5;None;Some 9;None;Some 2;None;Some 1|];
     [|Some 8;None;None;None;Some 4;None;None;None;None|];
