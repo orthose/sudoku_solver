@@ -112,7 +112,7 @@ let check_solution grid =
             grid.(i).(j) <> None
             (* Y a-t-il un doublon ? *)
             && cardinal (feasible_row i j grid) = 0
-            && cardinal (feasible_row i j grid) = 0
-            && cardinal (feasible_row i j grid) = 0
+            && cardinal (feasible_column i j grid) = 0
+            && cardinal (feasible_square i j grid) = 0
         ) grid.(i)) grid
 

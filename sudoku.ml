@@ -20,21 +20,20 @@ let example1 = [|
 (* Vérifie que le sudoku est une matrice 9*9 *)
 let is_sudoku grid =
     Array.length grid = 9 && Array.length grid.(0) = 9
+    
+(* Partial mapping avec f : string -> string *)
+let map_str f s =
+    let n = String.length s in
+    let rec map_str i acc =
+        if i < n then 
+            map_str (i + 1) (acc ^ (f (String.make 1 s.[i])))
+        else acc 
+    in map_str 0 ""
 
 (* Parsing de fichier de grille de sudoku et renvoie la matrice *)   
-let parse file =
+let parse_file file =
     let cursor = open_in file in
     let res = Array.make_matrix 9 9 None in
-    
-    (* Partial mapping avec f : string -> string *)
-    let map_str f s =
-        let n = String.length s in
-        let rec map_str i acc =
-            if i < n then 
-                map_str (i + 1) (acc ^ (f (String.make 1 s.[i])))
-            else acc 
-        in map_str 0 ""
-    in
     
     (* Parcours de toutes les lignes du fichier *)
     let rec fill i =
@@ -60,6 +59,32 @@ let parse file =
             close_in cursor;
             if i < 9 then failwith ("height = " ^ (string_of_int i) ^ " != 9")
     in let () = fill 0 in res
+
+(* Parsing de string les lignes sont séparées par des # *)
+let parse_str str =
+    let res = Array.make_matrix 9 9 None in
+    let lines = List.filter (fun x -> x <> "") (
+        String.split_on_char '#' 
+        (map_str (fun s -> if s = " " then "" else s) str))
+    in  
+    let () =
+    let height = List.length lines in
+    if height <> 9 then
+        failwith ("height = " ^ (string_of_int height) ^ " != 9")
+    else
+    List.iteri (fun i line ->
+        let width = String.length line in
+        if width <> 9 then
+            failwith ("width = " ^ (string_of_int width) ^ " != 9") 
+        else
+        String.iteri (fun j c -> match c with
+        |'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9' ->
+        (* On convertit char en int *)
+        res.(i).(j) <- Some (int_of_string (String.make 1 c))       
+        |'-' -> ()
+        | c -> failwith ("invalid token " ^ (String.make 1 c))
+        ) line ) lines
+    in res
 
 (* Conversion de la grille du sudoku vers string *)
 let to_string =

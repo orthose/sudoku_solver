@@ -20,7 +20,7 @@ Je n'ai testé que sous Ubuntu 20.04 le programme.
 
 ```
 Solveur de sudoku classique 9*9
-cmd -if <infile> [-of <outfile>] -p
+cmd [-if <infile>] [-of <outfile>] [-p]
   -if Fichier de la grille de sudoku à résoudre
   -of Fichier de sortie pour enregistrer la solution
   -p Afficher le sudoku résolu sur la sortie standard
@@ -28,7 +28,13 @@ cmd -if <infile> [-of <outfile>] -p
   --help  Display this list of options
 ```
 
-* Il est nécessaire de toujours renseigner au moins -if le fichier d'entrée.
+* Il n'est pas nécessaire renseigner au moins -if le fichier d'entrée.
+En effet, le programme prendra la première ligne donnée en entrée standard comme
+grille de sudoku. Les lignes doivent être séparées par des #.
+
+```
+echo "9--1----5#--5-9-2-1#8---4----#----8----#---7-----#----26--9#2--3----6#---2--9--#--19-457-" | ./main
+```
 
 # Documentation
 * [Site de Céline Périllous](http://igm.univ-mlv.fr/~dr/XPOSE2013/sudoku/index.html)
@@ -38,4 +44,3 @@ cmd -if <infile> [-of <outfile>] -p
 * [Module String](https://ocaml.org/api/String.html)
 * [Module Arg](https://ocaml.org/api/Arg.html)
 * [Manipulation de fichier](https://ocaml.org/learn/tutorials/file_manipulation.html)
-

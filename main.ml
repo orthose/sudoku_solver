@@ -8,7 +8,7 @@ open Color
 (* Comment utiliser le programme ? *)
 let usage_msg = 
     "Solveur de sudoku classique 9*9\n"
-    ^ "cmd -if <infile> [-of <outfile>] -p"
+    ^ "cmd [-if <infile>] [-of <outfile>] [-p]"
 
 (* Arguments pouvant être modifiés par l'utilisateur *)
 let infile = ref ""
@@ -27,13 +27,17 @@ let main () =
     (* Pas d'arguments anonymes *)
     Arg.parse speclist (fun _ -> ()) usage_msg;
     
-    (* Gestion des erreurs *)
-    if !infile = "" then
-        print "Erreur: Précisez le fichier d'entrée de la grille à résoudre\n" Red
-    else
+    (* Gestion des arguments et erreurs *)
+    if (!infile = "" && !outfile = "") then print_sudoku := true;
         
     (* Appel des fonctions *)
-    let grid = Sudoku.parse !infile in
+    let grid =
+        (* Entrée standard *)
+        if !infile = "" then
+            Sudoku.parse_str (read_line ())
+        else 
+            Sudoku.parse_file !infile 
+    in
     let algo_res = Solver.solve grid in
     let check_res = Solver.check_solution grid in
     
