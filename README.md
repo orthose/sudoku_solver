@@ -20,10 +20,11 @@ Je n'ai testé que sous Ubuntu 20.04 le programme.
 
 ```
 Solveur de sudoku classique 9*9
-cmd [-if <infile>] [-of <outfile>] [-p]
+cmd [-if <infile>] [-of <outfile>] [-p] [-v]
   -if Fichier de la grille de sudoku à résoudre
   -of Fichier de sortie pour enregistrer la solution
   -p Afficher le sudoku résolu sur la sortie standard
+  -v Afficher les messages de succès et d'erreur
   -help  Display this list of options
   --help  Display this list of options
 ```

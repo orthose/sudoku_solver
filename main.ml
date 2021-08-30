@@ -8,18 +8,20 @@ open Color
 (* Comment utiliser le programme ? *)
 let usage_msg = 
     "Solveur de sudoku classique 9*9\n"
-    ^ "cmd [-if <infile>] [-of <outfile>] [-p]"
+    ^ "cmd [-if <infile>] [-of <outfile>] [-p] [-v]"
 
 (* Arguments pouvant être modifiés par l'utilisateur *)
 let infile = ref ""
 let outfile = ref ""
 let print_sudoku = ref false
+let verbose = ref false
 
 (* Options de la ligne de commande *)
 let speclist = [
     ("-if", Arg.Set_string infile, "Fichier de la grille de sudoku à résoudre");
     ("-of", Arg.Set_string outfile, "Fichier de sortie pour enregistrer la solution");
-    ("-p", Arg.Set print_sudoku, "Afficher le sudoku résolu sur la sortie standard")
+    ("-p", Arg.Set print_sudoku, "Afficher le sudoku résolu sur la sortie standard");
+    ("-v", Arg.Set verbose, "Afficher les messages de succès et d'erreur")
 ]
 
 let main () =
@@ -42,14 +44,20 @@ let main () =
     let check_res = Solver.check_solution grid in
     
     (* Affichage des résultats *)
-    if algo_res then
-        print "Succès de l'algorithme de résolution.\n" Green
-    else
-        print "Echec de l'algorithme de résolution.\n" Red;
-    if check_res then
-        print "Solution de la grille correcte.\n" Green
-    else
-        print "Solution de la grille incorrecte.\n" Red;
+    if algo_res then (
+        if !verbose then print "Succès de l'algorithme de résolution.\n" Green;
+    )
+    else (
+        if !verbose then print "Echec de l'algorithme de résolution.\n" Red;
+        exit 1
+    );
+    if check_res then (
+        if !verbose then print "Solution de la grille correcte.\n" Green;
+    )
+    else (
+        if !verbose then print "Solution de la grille incorrecte.\n" Red;
+        exit 2
+    );
     if !print_sudoku then Sudoku.print grid;
         
     (* Sauvegarde de la solution *)
@@ -68,7 +76,7 @@ let main () =
                     base ^ "_sol." ^ ext
             else !outfile
         in
-        print ("Sauvegarde de la solution de la grille dans " ^ file ^ "\n") Yellow; 
+        if !verbose then print ("Sauvegarde de la solution de la grille dans " ^ file ^ "\n") Yellow; 
         Sudoku.save file grid
         )
     
