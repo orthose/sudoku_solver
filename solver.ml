@@ -92,27 +92,59 @@ let rec is_valid grid locations =
 
 (* Résolution du sudoku *)
 let solve grid =
-    is_valid grid (compute_locations grid)
+    is_valid grid (compute_locations grid)  
+
+(* for_all pour parcourir matrice *)
+let rec for_all_matrix i j cond next stop =
+    if stop i j then true
+    else 
+        let (i', j') = next i j in
+        (cond i j) && (for_all_matrix i' j' cond next stop)
 
 (* Vérifie que la solution est correcte en vérifiant que toutes les
 cases sont remplies et qu'il n'y a pas de doublon *)
-let check_solution grid =
-    (* for_all mais avec indice *)
-    let for_alli f a =
-        let n = Array.length a in
-        let rec for_alli i =
-            if i = n then true
-            else f i && for_alli (i + 1)
-        in for_alli 0 
-    in  
-    
-    for_alli (fun i ->
-        for_alli (fun j ->
-            (* La grille est-elle remplie ? *)
-            grid.(i).(j) <> None
-            (* Y a-t-il un doublon ? *)
-            && cardinal (feasible_row i j grid) = 0
-            && cardinal (feasible_column i j grid) = 0
-            && cardinal (feasible_square i j grid) = 0
-        ) grid.(i)) grid
+let check_solution grid =  
+    for_all_matrix 0 0 (fun i j ->
+        (* La grille est-elle remplie ? *)
+        grid.(i).(j) <> None
+        (* Y a-t-il un doublon ? *)
+        && cardinal (feasible_row i j grid) = 0
+        && cardinal (feasible_column i j grid) = 0
+        && cardinal (feasible_square i j grid) = 0
+        ) 
+    (fun i j -> if j = 8 then (i + 1, 0) else (i, j + 1)) 
+    (fun i j -> i = 9)
+        
+(* Vérifie que la grille est résolvable avant de tenter la résolution
+sinon l'algortihme ne termine pas forcément *)
+let is_solvable grid =
+    for_all_matrix 0 0 (fun i j ->
+        match grid.(i).(j) with
+        (* Un emplacement vide n'est pas pris en compte *)
+        | None -> true
+        (* Y a-t-il un doublon dans toutes les directions ? *)
+        | Some x ->
+            (* Dans quel carré suis-je ? *)
+            let (si, sj) = ((i / 3) * 3, (j / 3) * 3) in
+            let cond ci cj =
+                match grid.(ci).(cj) with
+                | None -> true
+                (* On ignore la case où (i, j) = (ci, cj) *)
+                | Some y -> x <> y || (i, j) = (ci, cj)
+            in
+            (* Horizontalement *)
+            for_all_matrix i 0 cond
+                (fun ci cj -> (ci, cj + 1))
+                (fun ci cj -> cj = 9)
+            (* Verticalement *)
+            && for_all_matrix 0 j cond
+                (fun ci cj -> (ci + 1, cj))
+                (fun ci cj -> ci = 9)
+            (* Carré *)
+            && for_all_matrix si sj cond
+                (fun ci cj -> if cj = sj + 2 then (ci + 1, sj) else (ci, cj + 1))
+                (fun ci cj -> ci = si + 3 && cj = sj)
+        )
+    (fun i j -> if j = 8 then (i + 1, 0) else (i, j + 1)) 
+    (fun i j -> i = 9)
 

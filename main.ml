@@ -31,7 +31,6 @@ let main () =
     
     (* Gestion des arguments et erreurs *)
     if (!infile = "" && !outfile = "") then print_sudoku := true;
-        
     (* Appel des fonctions *)
     let grid =
         (* Entrée standard *)
@@ -40,6 +39,11 @@ let main () =
         else 
             Sudoku.parse_file !infile 
     in
+    if not (Solver.is_solvable grid) then (
+        if !verbose then print "Grille insoluble.\n" Red;
+        exit 1
+        )
+    else begin
     let algo_res = Solver.solve grid in
     let check_res = Solver.check_solution grid in
     
@@ -49,14 +53,14 @@ let main () =
     )
     else (
         if !verbose then print "Echec de l'algorithme de résolution.\n" Red;
-        exit 1
+        exit 2
     );
     if check_res then (
         if !verbose then print "Solution de la grille correcte.\n" Green;
     )
     else (
         if !verbose then print "Solution de la grille incorrecte.\n" Red;
-        exit 2
+        exit 3
     );
     if !print_sudoku then Sudoku.print grid;
         
@@ -79,5 +83,6 @@ let main () =
         if !verbose then print ("Sauvegarde de la solution de la grille dans " ^ file ^ "\n") Yellow; 
         Sudoku.save file grid
         )
+    end
     
 let () = main ()
