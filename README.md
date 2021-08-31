@@ -37,6 +37,18 @@ grille de sudoku. Les lignes doivent être séparées par des #.
 echo "9--1----5#--5-9-2-1#8---4----#----8----#---7-----#----26--9#2--3----6#---2--9--#--19-457-" | ./main
 ```
 
+# Interface web
+* Je mets à disposition une interface graphique web (fichier index.php).
+Pour l'utiliser il suffit de cloner le dépôt dans un serveur web pouvant exécuter
+des scripts PHP, puis de compiler le programme OCaml. Veillez également à donner
+la permission d'exécution correcte au fichier main.
+
+```
+chmod o+x main
+```
+
+* Le programme est utilisable en ligne depuis ce [site](https://pyroxene.ddns.net/sudoku_solver).
+
 # Documentation
 * [Site de Céline Périllous](http://igm.univ-mlv.fr/~dr/XPOSE2013/sudoku/index.html)
 * [Module Set](https://ocaml.org/api/Set.Make.html)

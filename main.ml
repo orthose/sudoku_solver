@@ -40,7 +40,7 @@ let main () =
             Sudoku.parse_file !infile 
     in
     if not (Solver.is_solvable grid) then (
-        if !verbose then print "Grille insoluble.\n" Red;
+        if !verbose then print "Grille de départ insoluble.\n" Red;
         exit 1
         )
     else begin
