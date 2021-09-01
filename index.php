@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu">
   <style>
-  /* Téléphone toute la largeur de l'écran */
-  @media (width < 500px) {
+  /* Téléphone toute la largeur de l'écran (width < 500px) */
+  @media only screen and (max-width: 499px) {
     body {
       width: 100%;
       margin: 0px;
@@ -17,8 +17,8 @@
       height: 99vw;
     }
   }
-  /* Ordinateur taille maximale de 500px */
-  @media (width >= 500px) {
+  /* Ordinateur taille maximale de 500px (width >= 500px) */
+  @media only screen and (min-width: 500px) {
     body {
       width: 500px;
       display: block;
@@ -167,7 +167,7 @@
     $input_hidden .= "'true'>";
   }
   echo $input_hidden;
-  echo "<table>";
+  echo "<table><tbody>";
   for ($i = 0; $i < 9; $i++) {
     echo "<tr>";
     for ($j = 0; $j < 9; $j++) {
@@ -175,7 +175,7 @@
     }
     echo "</tr>";
   }
-  echo "</table>";
+  echo "</tbody></table>";
   echo "<input type='submit' value='Solution'></form>";
   
   ?><br>
